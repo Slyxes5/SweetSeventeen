@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Birthday Invitation — Vathesya Ester Politon</title>
+  <meta name="description" content="Sweet Seventeen Invitation — 7 Nov 2025 · 17:00 WITA · Thea’s Home – Jl. Ahmad Yani, Kec. Tondano Barat">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Great+Vibes&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="/photo/main.jpg">
+  <meta property="og:title" content="Vathesya Sweet Seventeen Invitation"/>
+  <meta property="og:description" content="Join us to celebrate! 7 Nov 2025 · 17:00 WITA · Thea’s Home – Jl. Ahmad Yani, Kec. Tondano Barat"/>
+  <meta property="og:image" content="https://sweetseventeenvathesya.vercel.app/photo/main.jpg"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://sweetseventeenvathesya.vercel.app/"/>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <!-- MUSIC -->
+  <audio id="bgAudio" preload="auto" loop>
+    <source src="./audio/thea.mp3" type="audio/mpeg"/>
+  </audio>
+  <div class="music-ctl">
+    <button id="musicBtn" type="button" aria-pressed="false" aria-label="Toggle music">
+      <span class="mui">♪</span><span class="lbl">Play music</span>
+    </button>
+  </div>
+
+  <!-- Confetti canvas -->
+  <canvas id="confettiCanvas" aria-hidden="true"></canvas>
+
+  <!-- HERO -->
+  <header class="hero">
+    <!-- subtle petals -->
+    <div class="petal p1"></div><div class="petal p2"></div><div class="petal p3"></div>
+    <div class="petal p4"></div><div class="petal p5"></div>
+
+    <div class="hero-inner container center">
+      <span class="badge">You Are Invited</span>
+      <h1 class="title-serif">Sweet Seventeen Birthday Celebration</h1>
+      <div class="title-script">Vathesya Ester Politon</div>
+
+      <div class="countdown" id="countdown"></div>
+
+      <div style="margin-top:22px">
+        <button class="btn" id="openInviteBtn" type="button" aria-label="Open invitation">
+          Open Invitation
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+      </div>
+
+      <div class="hearts" aria-hidden="true">
+        <span>❤</span><span>❤</span><span>❤</span><span>❤</span><span>❤</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- QUOTE -->
+  <section class="section">
+    <div class="container">
+      <blockquote class="card">“Another year of blessings, love, and happiness — let’s celebrate together.”</blockquote>
+    </div>
+  </section>
+
+  <!-- MAIN PHOTO (single photo with curved frame/backdrop) -->
+  <section class="section" id="photo">
+    <div class="container">
+      <div class="arch-card card">
+        <div class="arch-bg"></div>
+        <img id="mainPhoto" class="arch-img" alt="Birthday Portrait"/>
+      </div>
+    </div>
+  </section>
+
+<!-- DETAILS (elegant) -->
+<section class="section" id="details">
+  <div class="container">
+    <h2 class="section-title">Event Details</h2>
+
+    <div class="details-grid">
+      <div class="detail-card pill">
+        <div class="detail-icon ic">📅</div>
+        <div>
+          <div class="detail-label">Date</div>
+          <div class="detail-value serif">Friday, November 7, 2025</div>
+        </div>
+      </div>
+
+      <div class="detail-card pill">
+        <div class="detail-icon ic">⏰</div>
+        <div>
+          <div class="detail-label">Time</div>
+          <div class="detail-value serif">5:00 PM WITA</div>
+        </div>
+      </div>
+
+      <div class="detail-card pill">
+        <div class="detail-icon ic">📍</div>
+        <div>
+          <div class="detail-label">Location</div>
+          <div class="detail-value serif">Thea’s Home – Jl. Ahmad Yani, Kec. Tondano Barat</div>
+        </div>
+      </div>
+
+      <div class="detail-card pill">
+        <div class="detail-icon ic">👗</div>
+        <div>
+          <div class="detail-label">Dress Code</div>
+          <div class="detail-value serif">Pink, White, Cream</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- banner lembut -->
+    <div class="intro-banner card soft">
+      <h3 class="intro-heading">Sweet Seventeen Birthday Celebration of</h3>
+      <div class="intro-name">Vathesya Ester Politon</div>
+      <p class="intro-note">It would be an honor and joy for us if you could attend to give your blessings and prayers.</p>
+    </div>
+
+    <div class="center" style="margin-top:16px">
+      <a id="icsBtn" class="btn btn-outline" download="Vathesya_Sweet17.ics">Add to Calendar</a>
+    </div>
+  </div>
+</section>
+
+
+  <!-- MAP -->
+  <section class="section">
+    <div class="container">
+      <div class="map-wrap card">
+        <iframe
+          title="Venue Map"
+          src="https://www.google.com/maps?q=1.295619,124.907806&z=18&output=embed"
+          width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+      <div class="center" style="margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <a class="btn btn-outline" target="_blank" href="https://maps.app.goo.gl/ze6zjgSvuVXNMBh98">Open in Google Maps</a>
+        <a class="btn btn-outline" target="_blank" href="https://wa.me/?text=Datang%20ya%20ke%20Sweet%2017%20Vathesya%20🎉%20https://sweetseventeenvathesya.vercel.app/">Share via WhatsApp</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY (dynamic) -->
+  <section class="section">
+    <div class="container">
+      <div class="carousel card">
+        <div class="carousel-track" id="carouselTrack"></div>
+        <button class="carousel-nav prev" id="prevBtn" aria-label="Previous slide">‹</button>
+        <button class="carousel-nav next" id="nextBtn" aria-label="Next slide">›</button>
+        <div class="carousel-dots" id="carouselDots"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GUESTBOOK -->
+  <section class="section" id="guestbook">
+    <div class="container">
+      <div class="card" style="padding:24px">
+        <h2 class="center" style="margin:0 0 16px;font-family:'Playfair Display',serif;">Guestbook — Ucapan</h2>
+        <p class="center muted" style="margin-top:0">Tinggalkan ucapan untuk Vathesya. Ucapan akan muncul langsung di bawah ini.</p>
+
+        <form id="gbForm" class="rsvp-grid" autocomplete="on">
+          <input type="text" id="gbTrap" name="website" style="display:none" tabindex="-1" autocomplete="off"/>
+          <div>
+            <label for="gbName">Nama</label>
+            <input type="text" id="gbName" placeholder="Nama Anda" required />
+          </div>
+          <div class="full">
+            <label for="gbMsg">Ucapan</label>
+            <textarea id="gbMsg" rows="3" placeholder="Selamat ulang tahun..." required></textarea>
+          </div>
+          <div class="actions">
+            <button type="submit" class="btn">Kirim Ucapan</button>
+          </div>
+        </form>
+
+        <div id="gbList" class="gb-list" aria-live="polite" aria-busy="false"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THANK YOU -->
+  <section class="section thankyou">
+    <div class="container">
+      <div class="thankyou-card fade-up">
+        <div class="thankyou-icon">♡</div>
+        <h2 class="thankyou-title">Thank You</h2>
+        <p class="thankyou-text">
+          With great joy, we hope you can join us to celebrate this special day together.<br>
+          Thank you for your prayers and love.
+        </p>
+        <div class="ty-love">Love,</div>
+        <div class="ty-name">Vathesya Ester Politon &amp; Family</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container small">© 2025 – Vathesya Ester Politon · All rights reserved</div>
+  </footer>
+
+  <!-- LIGHTBOX -->
+  <div id="lightbox" style="position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;place-items:center;z-index:90">
+    <img id="lightImg" alt="Preview" style="max-width:92vw;max-height:92vh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.35)"/>
+  </div>
+
+  <script src="./script.js?v=20251105"></script>
+</body>
+</html>
