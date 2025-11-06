@@ -151,6 +151,8 @@ img{max-width:100%;display:block}
 .rsvp-grid input,.rsvp-grid textarea{width:100%;padding:12px 14px;border:1px solid var(--pink-400);border-radius:12px;font:inherit}
 .rsvp-grid .actions{grid-column:1/-1;display:flex;gap:10px;justify-content:center;margin-top:8px}
 .gb-list{margin-top:18px;display:grid;gap:12px}
+.gb-list { max-height: 520px; overflow-y: auto; }
+#gbMoreBtn { display: inline-block; }
 .gb-item{border:1px solid var(--pink-400);border-radius:14px;padding:14px 16px;background:var(--pink-50)}
 .gb-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
 .gb-name{font-weight:700;color:var(--text-900)}
