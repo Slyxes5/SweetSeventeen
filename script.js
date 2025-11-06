@@ -14,8 +14,7 @@ const EVENT_ISO = "2025-11-07T17:00:00+08:00";
 
 // Guestbook endpoint (biarkan; kita pikirkan lagi nanti)
 const GUESTBOOK_ENDPOINT =
-"https://script.google.com/macros/s/AKfycbx3TVar8ZT6Wg9oeJoBYQy1DYe6DWQrwY5YyzOlZzFbY13BCYnZs_oSrpBdmPMmBtY3/exec";
-
+"https://script.google.com/macros/s/AKfycbxNgJ84vy2wdtzGBYHlFyWrQ6O5RcUPpogEM5_oJfkMT67ZIuVv0T_5mI1PV-Umaw8g/exec";
 /* ===========================
    Helpers & title
 =========================== */
@@ -190,7 +189,7 @@ if (!localStorage.getItem('guestbook_reset_done')) {
 }
 
 /* ===========================
-   Guestbook (disimpan; logic tetap)
+   Guestbook (with "Muat lagi")
 =========================== */
 const gbForm = document.getElementById('gbForm');
 const gbList = document.getElementById('gbList');
@@ -227,11 +226,12 @@ function lsAdd(entry){
   const arr = lsLoad(); arr.push(entry); lsSave(arr); renderOne(entry);
 }
 
-async function apiList(){
-  const url = `${GUESTBOOK_ENDPOINT}?t=${Date.now()}`;
-  const res = await fetch(url, { method: 'GET', cache: 'no-store' });
+/* ===== API (pagination) ===== */
+async function apiListPage(offset=0, limit=20){
+  const url = `${GUESTBOOK_ENDPOINT}?limit=${limit}&offset=${offset}&t=${Date.now()}`;
+  const res = await fetch(url, { method:'GET', cache:'no-store' });
   if(!res.ok) throw new Error(`GET ${res.status}`);
-  return res.json();
+  return res.json(); // { rows, nextOffset, hasMore, total }
 }
 async function apiAdd(entry){
   const url = `${GUESTBOOK_ENDPOINT}?t=${Date.now()}`;
@@ -239,23 +239,66 @@ async function apiAdd(entry){
   form.set('name', entry.name || '');
   form.set('from', entry.from || '');
   form.set('msg',  entry.msg  || '');
-  const res = await fetch(url, { method: 'POST', body: form, cache: 'no-store' });
+  const res = await fetch(url, { method:'POST', body: form, cache:'no-store' });
   if(!res.ok) throw new Error(`POST ${res.status}`);
   return res.json();
 }
 
+/* ===== State & "Muat lagi" button ===== */
+let gbOffset = 0;
+let gbHasMore = false;
+let gbLoading = false;
+
+function makeLoadMore(){
+  let btn = document.getElementById('gbMoreBtn');
+  if (!btn) {
+    btn = document.createElement('button');
+    btn.id = 'gbMoreBtn';
+    btn.className = 'btn';
+    btn.textContent = 'Muat lagi';
+    btn.style.display = 'none';
+    btn.style.marginTop = '12px';
+    gbList.after(btn);
+    btn.addEventListener('click', loadMore);
+  }
+  return btn;
+}
+
+async function loadMore(){
+  if (gbLoading || !gbHasMore) return;
+  gbLoading = true;
+  const btn = document.getElementById('gbMoreBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Memuat...'; }
+  try {
+    const { rows, nextOffset, hasMore } = await apiListPage(gbOffset, 20);
+    // render batch berikut (lama -> baru) agar muncul di bagian bawah
+    rows.slice().reverse().forEach(r =>
+      renderOne({ name:r.name, from:r.from, msg:r.msg, timestamp:r.timestamp }, { prepend:false })
+    );
+    gbOffset = nextOffset;
+    gbHasMore = hasMore;
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.style.display = gbHasMore ? '' : 'none';
+      btn.textContent = gbHasMore ? 'Muat lagi' : 'Sudah semua';
+    }
+    gbLoading = false;
+  }
+}
+
+/* ===== Init & submit ===== */
 (async function initGuestbook(){
   const bindSubmit = (sender) => {
     gbForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // Cari elemen di DALAM form + guard bila tidak ketemu
+      // Cari elemen di dalam form + guard
       const nameEl = gbForm?.querySelector('#gbName');
       const fromEl = gbForm?.querySelector('#gbRelation');
       const msgEl  = gbForm?.querySelector('#gbMsg');
       if (!nameEl || !fromEl || !msgEl) {
-        console.error('Guestbook: element not found', { nameEl, fromEl, msgEl });
-        alert('Form error: elemen input tidak ditemukan. Refresh halaman lalu coba lagi.');
+        alert('Form error: elemen input tidak ditemukan.');
         return;
       }
 
@@ -263,20 +306,16 @@ async function apiAdd(entry){
       const from = fromEl.value.trim();
       const msg  = msgEl.value.trim();
 
-      // Honeypot & throttle
-      const trap = gbForm.querySelector('#gbTrap');
-      if (trap?.value) return;
+      // honeypot + limiter
+      const trap = gbForm.querySelector('#gbTrap'); if (trap?.value) return;
       const last = +localStorage.getItem('gb_last') || 0;
-      if (Date.now() - last < 20000) {
-        alert('Tunggu sebentar sebelum kirim lagi ya.');
-        return;
-      }
+      if (Date.now() - last < 20000) { alert('Tunggu sebentar sebelum kirim lagi ya.'); return; }
       if (!msg) return;
       localStorage.setItem('gb_last', Date.now());
 
       try {
         await sender({ name, from, msg });
-        renderOne({ name, from, msg, timestamp: Date.now() });
+        renderOne({ name, from, msg, timestamp: Date.now() }); // tampilkan langsung di atas
         gbForm.reset();
       } catch (err) {
         console.error('Guestbook POST error:', err);
@@ -285,23 +324,30 @@ async function apiAdd(entry){
     });
   };
 
-  if (GUESTBOOK_ENDPOINT) {
+  if (GUESTBOOK_ENDPOINT){
     try {
-      gbList.setAttribute('aria-busy', 'true');
-      const rows = await apiList();
+      gbList.setAttribute('aria-busy','true');
+      const first = await apiListPage(0, 20);
       gbList.innerHTML = '';
-      rows.forEach(r => renderOne({
-        name: r.name, from: r.from, msg: r.msg,
-        timestamp: r.timestamp || Date.now()
-      }, { prepend: false }));
-      gbList.setAttribute('aria-busy', 'false');
+      // render batch pertama (lama -> baru) supaya terbaca natural dari atas ke bawah
+      first.rows.slice().reverse().forEach(r =>
+        renderOne({ name:r.name, from:r.from, msg:r.msg, timestamp:r.timestamp }, { prepend:false })
+      );
+      gbOffset = first.nextOffset;
+      gbHasMore = first.hasMore;
+      gbList.setAttribute('aria-busy','false');
+
+      makeLoadMore().style.display = gbHasMore ? '' : 'none';
       bindSubmit(apiAdd);
     } catch (err) {
-      console.warn('Guestbook online gagall, fallback LocalStorage:', err);
-      lsInit(); bindSubmit(lsAdd);
+      console.warn('Guestbook online gagal, fallback LocalStorage:', err);
+      lsInit();
+      makeLoadMore().style.display = 'none';
+      bindSubmit(lsAdd);
     }
   } else {
-    lsInit(); bindSubmit(lsAdd);
+    lsInit();
+    makeLoadMore().style.display = 'none';
+    bindSubmit(lsAdd);
   }
 })();
-
