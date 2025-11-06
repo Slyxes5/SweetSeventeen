@@ -5,8 +5,8 @@
 const PHOTO_URL = "/photo/main.jpg";
 const GALLERY_URLS = [
   "/photo/1.jpg","/photo/2.jpg","/photo/3.jpg",
-  "/photo/4.jpg","/photo/5.JPG","/photo/6.JPG",
-  "/photo/7.jpg","/photo/8.jpg","/photo/9.JPG"
+  "/photo/4.jpg","/photo/5.jpg","/photo/6.jpg",
+  "/photo/7.jpg","/photo/8.jpg","/photo/9.jpg"
 ];
 
 // Waktu acara (WITA)
