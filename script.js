@@ -296,7 +296,7 @@ async function apiAdd(entry){
       gbList.setAttribute('aria-busy', 'false');
       bindSubmit(apiAdd);
     } catch (err) {
-      console.warn('Guestbook online gagal, fallback LocalStorage:', err);
+      console.warn('Guestbook online gagall, fallback LocalStorage:', err);
       lsInit(); bindSubmit(lsAdd);
     }
   } else {
