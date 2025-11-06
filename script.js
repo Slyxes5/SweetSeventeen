@@ -191,29 +191,116 @@ if (!localStorage.getItem('guestbook_reset_done')) {
 /* ===========================
    Guestbook (disimpan; logic tetap)
 =========================== */
-const gbForm=document.getElementById('gbForm'); const gbList=document.getElementById('gbList'); const LS_KEY='guestbook_entries_v2';
-function escapeHTML(s){ return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
-function renderOne(entry,{prepend=true}={}){ const {name,from,msg,timestamp}=entry; const item=document.createElement('div'); item.className='gb-item';
-  const when=timestamp?new Date(timestamp).toLocaleString():''; item.innerHTML=`<div class="gb-head"><div class="gb-name">${escapeHTML(name||'Anonim')}</div><div class="gb-meta">${escapeHTML(when)}</div></div><p class="gb-msg">${escapeHTML(msg||'')}${from?`\n— ${escapeHTML(from)}`:''}</p>`; prepend?gbList.prepend(item):gbList.appendChild(item); }
-function lsLoad(){ try{return JSON.parse(localStorage.getItem(LS_KEY)||'[]')}catch{return[]} } function lsSave(arr){ localStorage.setItem(LS_KEY,JSON.stringify(arr)); }
-function lsInit(){ gbList.innerHTML=''; lsLoad().sort((a,b)=>(a.timestamp||0)-(b.timestamp||0)).forEach(e=>renderOne(e,{prepend:false})); }
-function lsAdd(entry){ const arr=lsLoad(); arr.push(entry); lsSave(arr); renderOne(entry); }
-async function apiList(){ const url=`${GUESTBOOK_ENDPOINT}?t=${Date.now()}`; const res=await fetch(url,{method:'GET',cache:'no-store'}); if(!res.ok) throw new Error(`GET ${res.status}`); return res.json(); }
-async function apiAdd(entry){ const url=`${GUESTBOOK_ENDPOINT}?t=${Date.now()}`; const form=new URLSearchParams(); form.set('name',entry.name||''); form.set('from',entry.from||''); form.set('msg',entry.msg||''); const res=await fetch(url,{method:'POST',body:form,cache:'no-store'}); if(!res.ok) throw new Error(`POST ${res.status}`); return res.json(); }
+const gbForm = document.getElementById('gbForm');
+const gbList = document.getElementById('gbList');
+const LS_KEY = 'guestbook_entries_v2';
+
+function escapeHTML(s){
+  return String(s).replace(/[&<>"']/g, m => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
+  }[m]));
+}
+
+function renderOne(entry, { prepend = true } = {}){
+  const { name, from, msg, timestamp } = entry;
+  const item = document.createElement('div');
+  item.className = 'gb-item';
+  const when = timestamp ? new Date(timestamp).toLocaleString() : '';
+  item.innerHTML =
+    `<div class="gb-head">
+       <div class="gb-name">${escapeHTML(name || 'Anonim')}</div>
+       <div class="gb-meta">${escapeHTML(when)}</div>
+     </div>
+     <p class="gb-msg">${escapeHTML(msg || '')}${from ? `\n— ${escapeHTML(from)}` : ''}</p>`;
+  prepend ? gbList.prepend(item) : gbList.appendChild(item);
+}
+
+function lsLoad(){ try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch { return []; } }
+function lsSave(arr){ localStorage.setItem(LS_KEY, JSON.stringify(arr)); }
+function lsInit(){
+  gbList.innerHTML = '';
+  lsLoad().sort((a,b)=>(a.timestamp||0)-(b.timestamp||0))
+          .forEach(e => renderOne(e, { prepend:false }));
+}
+function lsAdd(entry){
+  const arr = lsLoad(); arr.push(entry); lsSave(arr); renderOne(entry);
+}
+
+async function apiList(){
+  const url = `${GUESTBOOK_ENDPOINT}?t=${Date.now()}`;
+  const res = await fetch(url, { method: 'GET', cache: 'no-store' });
+  if(!res.ok) throw new Error(`GET ${res.status}`);
+  return res.json();
+}
+async function apiAdd(entry){
+  const url = `${GUESTBOOK_ENDPOINT}?t=${Date.now()}`;
+  const form = new URLSearchParams();
+  form.set('name', entry.name || '');
+  form.set('from', entry.from || '');
+  form.set('msg',  entry.msg  || '');
+  const res = await fetch(url, { method: 'POST', body: form, cache: 'no-store' });
+  if(!res.ok) throw new Error(`POST ${res.status}`);
+  return res.json();
+}
 
 (async function initGuestbook(){
-  const bindSubmit=(sender)=>{ gbForm?.addEventListener('submit',async(e)=>{ e.preventDefault();
-    const name=document.getElementById('gbName').value.trim();
-    const from=document.getElementById('gbRelation').value.trim();
-    const msg =document.getElementById('gbMsg').value.trim();
-    const trap=document.getElementById('gbTrap'); if(trap?.value) return;
-    const last=+localStorage.getItem('gb_last')||0; if(Date.now()-last<20000){ alert('Tunggu sebentar sebelum kirim lagi ya.'); return; }
-    if(!msg) return; localStorage.setItem('gb_last',Date.now());
-    try{ await sender({name,from,msg}); renderOne({name,from,msg,timestamp:Date.now()}); gbForm.reset(); }
-    catch(err){ console.error('Guestbook POST error:',err); alert('Gagal mengirim ucapan. Coba lagi.'); }
-  });};
-  if(GUESTBOOK_ENDPOINT){
-    try{ gbList.setAttribute('aria-busy','true'); const rows=await apiList(); gbList.innerHTML=''; rows.forEach(r=>renderOne({name:r.name,from:r.from,msg:r.msg,timestamp:r.timestamp||Date.now()},{prepend:false})); gbList.setAttribute('aria-busy','false'); bindSubmit(apiAdd); }
-    catch(err){ console.warn('Guestbook online gagal, fallback LocalStorage:',err); lsInit(); bindSubmit(lsAdd); }
-  } else { lsInit(); bindSubmit(lsAdd); }
+  const bindSubmit = (sender) => {
+    gbForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Cari elemen di DALAM form + guard bila tidak ketemu
+      const nameEl = gbForm?.querySelector('#gbName');
+      const fromEl = gbForm?.querySelector('#gbRelation');
+      const msgEl  = gbForm?.querySelector('#gbMsg');
+      if (!nameEl || !fromEl || !msgEl) {
+        console.error('Guestbook: element not found', { nameEl, fromEl, msgEl });
+        alert('Form error: elemen input tidak ditemukan. Refresh halaman lalu coba lagi.');
+        return;
+      }
+
+      const name = nameEl.value.trim();
+      const from = fromEl.value.trim();
+      const msg  = msgEl.value.trim();
+
+      // Honeypot & throttle
+      const trap = gbForm.querySelector('#gbTrap');
+      if (trap?.value) return;
+      const last = +localStorage.getItem('gb_last') || 0;
+      if (Date.now() - last < 20000) {
+        alert('Tunggu sebentar sebelum kirim lagi ya.');
+        return;
+      }
+      if (!msg) return;
+      localStorage.setItem('gb_last', Date.now());
+
+      try {
+        await sender({ name, from, msg });
+        renderOne({ name, from, msg, timestamp: Date.now() });
+        gbForm.reset();
+      } catch (err) {
+        console.error('Guestbook POST error:', err);
+        alert('Gagal mengirim ucapan. Coba lagi.');
+      }
+    });
+  };
+
+  if (GUESTBOOK_ENDPOINT) {
+    try {
+      gbList.setAttribute('aria-busy', 'true');
+      const rows = await apiList();
+      gbList.innerHTML = '';
+      rows.forEach(r => renderOne({
+        name: r.name, from: r.from, msg: r.msg,
+        timestamp: r.timestamp || Date.now()
+      }, { prepend: false }));
+      gbList.setAttribute('aria-busy', 'false');
+      bindSubmit(apiAdd);
+    } catch (err) {
+      console.warn('Guestbook online gagal, fallback LocalStorage:', err);
+      lsInit(); bindSubmit(lsAdd);
+    }
+  } else {
+    lsInit(); bindSubmit(lsAdd);
+  }
 })();
+
