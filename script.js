@@ -14,8 +14,7 @@ const EVENT_ISO = "2025-11-07T17:00:00+08:00";
 
 // Guestbook endpoint (biarkan; kita pikirkan lagi nanti)
 const GUESTBOOK_ENDPOINT =
-  "https://script.google.com/macros/s/AKfycbzawYNXEI09XKYaUE4F5URbdrg9x5_ejxtwVnGCoEqSs5ZdGb1STgzHaDiLEFDuwDDa/exec";
-
+"https://script.google.com/macros/s/AKfycbwOuOk4x8DrAhdffn4iRV8kBKS0ZgIQnBXanPOPIkwC3OW2FKewLA8K-RHRsfMbstxc/exec";
 /* ===========================
    Helpers & title
 =========================== */
