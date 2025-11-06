@@ -204,7 +204,7 @@ async function apiAdd(entry){ const url=`${GUESTBOOK_ENDPOINT}?t=${Date.now()}`;
 (async function initGuestbook(){
   const bindSubmit=(sender)=>{ gbForm?.addEventListener('submit',async(e)=>{ e.preventDefault();
     const name=document.getElementById('gbName').value.trim();
-    const from=document.getElementById('gbFrom').value.trim();
+    const from=document.getElementById('gbRelation').value.trim();
     const msg =document.getElementById('gbMsg').value.trim();
     const trap=document.getElementById('gbTrap'); if(trap?.value) return;
     const last=+localStorage.getItem('gb_last')||0; if(Date.now()-last<20000){ alert('Tunggu sebentar sebelum kirim lagi ya.'); return; }
